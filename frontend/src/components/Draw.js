@@ -1,18 +1,30 @@
-import React, {useRef} from 'react';
+import React, {useRef, useState} from 'react';
 import {SketchField, Tools} from 'react-sketch2';
-import {Button} from 'react-bootstrap'
+import {Button, Alert} from 'react-bootstrap'
 
 
 const Draw = () => {
     const sketch = useRef()
-
+    const axios = require('axios');
+    const [sent, setSent] = useState(false)
     const handleReset = () => {
         const canvas = sketch.current.clear();
         sketch.current._backgroundColor('black')
     }
     const sendData = () => {
         const canvas = sketch.current.toDataURL()
-        console.log(canvas)
+        const form = new FormData()
+        form.append('image', canvas)
+        const headers = {
+            'accept': 'application/json'
+        }
+        axios.post('http://localhost:8000/api/digit/', form, {headers: headers})
+            .then(function (response) {
+                console.log(response)
+                setSent(true);
+            }).catch(function (err) {
+            console.log(err)
+        })
     }
 
     const getResult = (id) => {
@@ -20,6 +32,7 @@ const Draw = () => {
     }
     return (
         <React.Fragment>
+            {sent && <Alert variant='dark' onClose={() => setSent(false)} dismissible>Data successfully sent</Alert>}
             <SketchField
                 ref={sketch}
                 width='500px'
@@ -31,8 +44,8 @@ const Draw = () => {
                 imageFormat='jpg'
                 lineWidth={30}/>
             <div className='mt-3'>
-                <Button onClick={sendData} variant="primary">Send</Button>
-                <Button onClick={handleReset} variant="danger">Reset</Button>
+                <Button onClick={sendData} size="lg" variant="primary">Send</Button>
+                <Button className='ml-2' onClick={handleReset} size="lg" variant="danger">Reset</Button>
             </div>
         </React.Fragment>
     )
