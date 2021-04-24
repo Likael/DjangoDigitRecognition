@@ -4,6 +4,10 @@
 
 .idea
 
+/backend/__pycache__/
+/backend/*.pyc
+/backend/db.sqlite3
+/backend/media
 # dependencies
 /frontend/node_modules
 /frontend/.pnp
